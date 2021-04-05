@@ -1,17 +1,13 @@
 body {
-  margin: 0;
-  padding: 0;
   font-family: Arial, Helvetica, sans-serif;
 }
 
-nav {
-  font-size: 2rem;
-  font-weight: bold;
-  padding: 0.5rem;
-  background-color: beige;
+ul {
+  margin: 0;
+  padding: 0;
 }
 
-main {
-  padding: 1rem;
-  margin: auto 0;
+p {
+  margin: 0;
+  padding: 0;
 }

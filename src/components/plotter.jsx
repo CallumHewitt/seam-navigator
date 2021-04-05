@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Stop from "./stop";
 import { calculateRoute } from "../service/routeCalculator";
+import RouteCards from "./routeCards";
 
 class Plotter extends Component {
   constructor(props) {
@@ -26,51 +27,38 @@ class Plotter extends Component {
 
   render() {
     const route = this.state.route;
+    const accordionId = "accordion";
 
     return (
-      <div>
-        <ul>
-          {route.map((stopId, index) => (
-            <Stop
-              key={index}
-              id={index}
-              options={this.state.stops}
-              selected={this.getLabelFromId(stopId)}
-              onChange={this.handleChangeStop}
-              onDelete={this.handleDeleteStop}
-            ></Stop>
+      <div className="row">
+        <div className="col-sm-4">
+          <button className="btn btn-primary my-2" onClick={this.handleAddStop}>
+            Add Stop
+          </button>
+          <ul>
+            {route.map((stopId, index) => (
+              <Stop
+                key={index}
+                id={index}
+                options={this.state.stops}
+                selected={this.getLabelFromId(stopId)}
+                onChange={this.handleChangeStop}
+                onDelete={this.handleDeleteStop}
+              ></Stop>
+            ))}
+          </ul>
+        </div>
+        <div id={accordionId} className="col-sm-6">
+          {this.calculateLegs().map((leg) => (
+            <RouteCards
+              key={leg.to + leg.from}
+              leg={leg}
+              dataParent={accordionId}
+            ></RouteCards>
           ))}
-        </ul>
-        <button onClick={this.handleAddStop}>Add Stop</button>
-        <ul>{this.renderRouteDetails()}</ul>
+        </div>
       </div>
     );
-  }
-
-  renderRouteDetails() {
-    const route = this.state.route;
-    const legs = [...Array(route.length - 1).keys()].map((index) => {
-      return this.calculateLeg(route[index], route[index + 1]);
-    });
-    const filteredLegs = legs.filter((leg) => leg !== undefined);
-
-    return filteredLegs.map((leg) => (
-      <li key={leg.from + leg.to}>
-        {this.getLabelFromId(leg.from) + " to " + this.getLabelFromId(leg.to)}
-        <p>Chalked Distance: {leg.chalkedDistance} miles</p>
-        <p>Crow Distance: {leg.crowDistance} miles</p>
-        <p>Route:</p>
-        <ul>
-          {leg.route.map((step) => (
-            <li key={step.from + step.to}>
-              {this.getLabelFromId(step.from)}
-              {" -> "}
-              {this.getLabelFromId(step.to)} ({step.distance})
-            </li>
-          ))}
-        </ul>
-      </li>
-    ));
   }
 
   handleChangeStop = (index, selected) => {
@@ -91,9 +79,11 @@ class Plotter extends Component {
   }
 
   handleDeleteStop = (index) => {
-    const route = [...this.state.route];
-    route.splice(index, 1);
-    this.setState({ route });
+    if (this.state.route.length > 1) {
+      const route = [...this.state.route];
+      route.splice(index, 1);
+      this.setState({ route });
+    }
   };
 
   handleAddStop = () => {
@@ -102,8 +92,26 @@ class Plotter extends Component {
     }));
   };
 
+  calculateLegs() {
+    const route = this.state.route;
+    const legs = [...Array(route.length - 1).keys()].map((index) => {
+      return this.calculateLeg(route[index], route[index + 1]);
+    });
+    return legs.filter((leg) => leg !== undefined);
+  }
+
   calculateLeg(stopIdFrom, stopIdTo) {
-    return calculateRoute(this.state.map, stopIdFrom, stopIdTo);
+    let leg = calculateRoute(this.state.map, stopIdFrom, stopIdTo);
+    if (leg !== undefined) {
+      leg.from = this.getLabelFromId(leg.from);
+      leg.to = this.getLabelFromId(leg.to);
+      leg.route.forEach((jump) => {
+        jump.from = this.getLabelFromId(jump.from);
+        jump.to = this.getLabelFromId(jump.to);
+      });
+    }
+    console.log(leg);
+    return leg;
   }
 }
 

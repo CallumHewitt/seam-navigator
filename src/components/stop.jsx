@@ -6,8 +6,10 @@ class Stop extends Component {
     const datalistId = id + "StopOptions";
     const selected = this.props.selected;
     return (
-      <div>
+      <div className="input-group mb-2">
         <input
+          type="text"
+          className="form-control"
           value={selected}
           list={datalistId}
           placeholder="Enter stop..."
@@ -18,7 +20,13 @@ class Stop extends Component {
             <option key={option.id} value={option.label} />
           ))}
         </datalist>
-        <button onClick={() => this.props.onDelete(id)}>Delete Stop</button>
+        <button
+          className="btn btn-danger"
+          type="button"
+          onClick={() => this.props.onDelete(id)}
+        >
+          Delete
+        </button>
       </div>
     );
   }

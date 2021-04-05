@@ -11,12 +11,12 @@ class App extends Component {
   render() {
     return (
       <React.Fragment>
-        <nav>
-          Seam Navigator
+        <nav className="navbar navbar-expand-lg navbar-dark bg-light">
+          <h1>Seam Navigator</h1>
         </nav>
-        <main>
+        <div className="container-lg m-3">
           <Plotter map={map}></Plotter>
-        </main>
+        </div>
       </React.Fragment>
     );
   }
