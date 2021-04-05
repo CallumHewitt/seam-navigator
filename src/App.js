@@ -12,7 +12,7 @@ class App extends Component {
     return (
       <React.Fragment>
         <nav className="navbar navbar-expand-lg navbar-dark bg-light">
-          <h1>Seam Navigator</h1>
+          <h2>Seam Navigator</h2>
         </nav>
         <div className="container-lg m-3">
           <Plotter map={map}></Plotter>

@@ -5,14 +5,26 @@ export function calculateRoute(map, fromId, toId) {
     return undefined;
   } else {
     const crowDistance = distanceBetweenNodes(startNode, endNode)
-    const route = getDijkstraRoute(map, fromId, toId)
-    const chalkedDistance = route.map(step => step.distance).reduce((prev, curr) => prev + curr, 0)
+    let routeDetails = getDijkstraRoute(map, fromId, toId)
+    let warning = ''
+    if (routeDetails.remainingDistance !== 0) {
+      let closestNodeName
+      if (routeDetails.route.length === 0) {
+        closestNodeName = map.nodes[fromId].name
+      } else {
+        closestNodeName = map.nodes[routeDetails.route[routeDetails.route.length - 1].to].name;
+      }
+      const formattedDistance = routeDetails.remainingDistance.toLocaleString(undefined, { maximumFractionDigits: 2 })
+      warning = `Destination could not be reached along chalked routes. Navigating to ${closestNodeName}. An additional ${formattedDistance} miles of deep black travel will be required.`
+    }
+    const chalkedDistance = routeDetails.route.map(step => step.distance).reduce((prev, curr) => prev + curr, 0)
     return {
       chalkedDistance,
       crowDistance,
-      route,
+      route: routeDetails.route,
       from: fromId,
-      to: toId
+      to: toId,
+      warning
     };
   }
 }
@@ -25,13 +37,17 @@ export function distanceBetweenNodes(node1, node2) {
 }
 
 function getDijkstraRoute(map, fromId, toId) {
+  if (fromId === toId) {
+    return { route: [], remainingDistance: 0 }
+  }
+
   let distances = {}
-  let previous = {}
+  let backRecord = {}
   let unvisited = new Set(Object.keys(map.nodes))
   let neighbours = {}
   unvisited.forEach(nodeId => {
     distances[nodeId] = Number.MAX_VALUE
-    previous[nodeId] = undefined
+    backRecord[nodeId] = undefined
     neighbours[nodeId] = []
   })
   map.edges.forEach(edge => {
@@ -53,28 +69,55 @@ function getDijkstraRoute(map, fromId, toId) {
       const alt = distances[current] + jumpDistance
       if (alt < distances[neighbour]) {
         distances[neighbour] = alt
-        previous[neighbour] = [current, jumpDistance]
+        backRecord[neighbour] = [current, jumpDistance]
       }
     }
   }
 
-  return previousToRoute(previous, toId)
+  if (backRecord[toId] === undefined) {
+    // Unreachable
+    const reachableNodes = Object.keys(distances).filter((key) => distances[key] !== Number.MAX_VALUE)
+    const closestNode = getClosestNode(map, toId, reachableNodes)
+    const route = getDijkstraRoute(map, fromId, closestNode.node)
+    console.log(route)
+    return {
+      route: route.route,
+      remainingDistance: closestNode.distance
+    }
+  } else {
+    return {
+      route: backRecordToRoute(backRecord, toId),
+      remainingDistance: 0
+    }
+  }
 
 }
 
-function previousToRoute(previous, toId) {
-  if (previous[toId] === undefined) {
-    return []
-  } else {
-    let nextId = toId;
-    let route = []
-    while (previous[nextId] !== undefined) {
-      const previousValue = previous[nextId]
-      route.push({
-        to: nextId, from: previousValue[0], distance: previousValue[1]
-      })
-      nextId = previousValue[0]
+function backRecordToRoute(backRecord, toId) {
+  let nextId = toId;
+  let route = []
+  while (backRecord[nextId] !== undefined) {
+    const record = backRecord[nextId]
+    route.push({
+      to: nextId, from: record[0], distance: record[1]
+    })
+    nextId = record[0]
+  }
+  return route.reverse();
+}
+
+function getClosestNode(map, toId, reachableNodes) {
+  let closestNode
+  let closestDistance = Number.MAX_VALUE
+  for (let node of reachableNodes) {
+    const distance = distanceBetweenNodes(map.nodes[node], map.nodes[toId])
+    if (distance < closestDistance) {
+      closestDistance = distance
+      closestNode = node
     }
-    return route.reverse();
+  }
+  return {
+    node: closestNode,
+    distance: closestDistance
   }
 }

@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import "./routeCards.css";
 
 class RouteCards extends Component {
   render() {
@@ -29,6 +28,9 @@ class RouteCards extends Component {
               </li>
             ))}
           </ul>
+          {!!leg.warning && (
+            <div className="alert alert-warning">{leg.warning}</div>
+          )}
         </div>
       </div>
     );
