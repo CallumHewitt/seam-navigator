@@ -10,7 +10,7 @@ const nodes = {
     starboardZeeroads: { name: "The Starboard Zeeroads", x: 0, y: 0, z: 2000, hidden: false },
     portZeeroads: { name: "The Port Zeeroads", x: 0, y: 0, z: -2000, hidden: false },
     hopsack: { name: "Hopsack", x: 851, y: 1532, z: -2973, hidden: false },
-    caves: { name: "The Caves", x: -1589, y: 1623, z: -963, hidden: true },
+    caves: { name: "The Caves", x: -1589, y: 1623, z: -963, hidden: false },
     tambour: { name: "Tambour", x: -731, y: -2531, z: 891, hidden: false }
 }
 
