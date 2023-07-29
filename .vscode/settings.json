@@ -1,7 +1,6 @@
 {
-    "cSpell.words": [
-        "Wyroads",
-        "Zeeroads",
-        "gathernotch"
-    ]
+  "cSpell.words": ["Wyroads", "Zeeroads", "gathernotch"],
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-action.json": "file:///c%3A/Users/callu/OneDrive/Documents/Code/seam-navigator/.github/workflows/deploy.yml"
+  }
 }
