@@ -7,15 +7,15 @@ class App extends Component {
   render() {
     return (
       <React.Fragment>
-        <nav className="navbar navbar-expand-lg navbar-dark bg-light">
-          <div className="container-fluid pl-0">
+        <nav className="navbar navbar-expand-lg navbar-dark bg-light px-4">
+          <div className="container-fluid p-0">
             <h2 className="float-start">Seam Navigator</h2>
             <a className="float-end" href="http://callumh.io">
               <i className="fa-regular fa-xl fa-circle-question"></i>
             </a>
           </div>
         </nav>
-        <div className="container-lg m-0 py-3">
+        <div className="container-lg m-0 py-3 px-4">
           <Plotter map={this.filterMap(map)}></Plotter>
         </div>
       </React.Fragment >

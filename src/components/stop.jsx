@@ -13,14 +13,12 @@ class Stop extends Component {
         </datalist>
         <div className="input-group mb-2">
           <input
-            class="form-control"
+            className="form-control"
             value={this.props.text}
             list={datalistId}
             placeholder="Enter stop..."
             onChange={(e) => this.handleInputChange(id, e)}
-            onFocus={() => this.handleInputFocus(id)}
           />
-          {/*<div className="btn-group" role="group">*/}
           <button
             className="btn btn-secondary"
             type="button"
@@ -35,7 +33,6 @@ class Stop extends Component {
           >
             <i className="fa-solid fa-trash-can"></i>
           </button>
-          {/*</div>*/}
         </div>
       </div>
     );
@@ -47,12 +44,6 @@ class Stop extends Component {
       text = "";
     }
     this.props.onChange(id, text);
-  };
-
-  handleInputFocus = (id) => {
-    if (this.props.options.includes(this.props.text)) {
-      this.props.onChange(id, "");
-    }
   };
 
   handleClear = (id) => {
