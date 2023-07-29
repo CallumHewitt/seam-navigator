@@ -4,21 +4,41 @@ import Plotter from './components/plotter'
 import map from './data/map'
 
 class App extends Component {
-  state = {
-    map
-  }
-
   render() {
     return (
       <React.Fragment>
         <nav className="navbar navbar-expand-lg navbar-dark bg-light">
-          <h2>Seam Navigator</h2>
+          <div className="container-fluid pl-0">
+            <h2 className="float-start">Seam Navigator</h2>
+            <a className="float-end" href="http://callumh.io">
+              <i className="fa-regular fa-xl fa-circle-question"></i>
+            </a>
+          </div>
         </nav>
-        <div className="container-lg m-3">
-          <Plotter map={map}></Plotter>
+        <div className="container-lg m-0 py-3">
+          <Plotter map={this.filterMap(map)}></Plotter>
         </div>
-      </React.Fragment>
+      </React.Fragment >
     );
+  }
+
+  filterMap = (map) => {
+    const nodes = map.nodes
+    const hiddenNodeIds = new Set(Object.keys(nodes).filter(nodeId => nodes[nodeId].hidden))
+    const filteredNodes = Object.keys(nodes)
+      .filter(nodeId => !hiddenNodeIds.has(nodeId))
+      .reduce((obj, key) => {
+        obj[key] = nodes[key];
+        return obj;
+      }, {});
+    const filteredEdges = map.edges
+      .filter(edge => !(hiddenNodeIds.has(edge[0]) || hiddenNodeIds.has(edge[1])))
+    map = {
+      nodes: filteredNodes,
+      edges: filteredEdges
+    }
+    console.log("Using map: ", map)
+    return map
   }
 }
 

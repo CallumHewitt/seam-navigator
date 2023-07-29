@@ -3,7 +3,6 @@ import React, { Component } from "react";
 class RouteCards extends Component {
   render() {
     const leg = this.props.leg;
-
     return (
       <div className="card mb-2" key={leg.from + leg.to}>
         <div className="card-header">

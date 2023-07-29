@@ -6,21 +6,8 @@ import RouteCards from "./routeCards";
 class Plotter extends Component {
   constructor(props) {
     super(props);
-    const map = props.map;
-    const nodes = props.map.nodes;
-    const stops = Object.keys(nodes)
-      .filter((nodeId) => !nodes[nodeId].hidden)
-      .map((nodeId) => {
-        return {
-          id: nodeId,
-          label: nodes[nodeId].name,
-        };
-      });
-    const route = ["", ""];
     this.state = {
-      map,
-      stops,
-      route,
+      route: ["", ""],
       distance: 0,
     };
   }
@@ -28,27 +15,28 @@ class Plotter extends Component {
   render() {
     const route = this.state.route;
     const accordionId = "accordion";
-
     return (
       <div className="row">
-        <div className="col-sm-4">
-          <button className="btn btn-primary my-2" onClick={this.handleAddStop}>
+        <div className="col-md-5">
+          <button className="btn btn-primary mb-2" onClick={this.handleAddStop}>
             Add Stop
           </button>
-          <ul>
-            {route.map((stopId, index) => (
+          <div>
+            {route.map((text, index) => (
               <Stop
-                key={index}
                 id={index}
-                options={this.state.stops}
-                selected={this.getLabelFromId(stopId)}
+                key={index}
+                text={text}
+                options={Object.values(this.props.map.nodes).map(
+                  (node) => node.name
+                )}
                 onChange={this.handleChangeStop}
                 onDelete={this.handleDeleteStop}
               ></Stop>
             ))}
-          </ul>
+          </div>
         </div>
-        <div id={accordionId} className="col-sm-6">
+        <div id={accordionId} className="col-md-7">
           {this.calculateLegs().map((leg) => (
             <RouteCards
               key={leg.to + leg.from}
@@ -61,22 +49,17 @@ class Plotter extends Component {
     );
   }
 
-  handleChangeStop = (index, selected) => {
-    const stopId = this.getIdFromLabel(selected);
-    const route = [...this.state.route];
-    route[index] = stopId;
-    this.setState({ route });
+  handleAddStop = () => {
+    this.setState((prevState) => ({
+      route: [...prevState.route, ""],
+    }));
   };
 
-  getIdFromLabel(label) {
-    const stop = this.state.stops.find((value) => value.label === label);
-    return !!stop ? stop.id : undefined;
-  }
-
-  getLabelFromId(id) {
-    const stop = this.state.stops.find((value) => value.id === id);
-    return !!stop ? stop.label : "";
-  }
+  handleChangeStop = (index, text) => {
+    const route = [...this.state.route];
+    route[index] = text;
+    this.setState({ route });
+  };
 
   handleDeleteStop = (index) => {
     if (this.state.route.length > 1) {
@@ -86,32 +69,39 @@ class Plotter extends Component {
     }
   };
 
-  handleAddStop = () => {
-    this.setState((prevState) => ({
-      route: [...prevState.route, ""],
-    }));
-  };
-
   calculateLegs() {
     const route = this.state.route;
     const legs = [...Array(route.length - 1).keys()].map((index) => {
-      return this.calculateLeg(route[index], route[index + 1]);
+      const stopKeyFrom = this.getNodeKeyFromName(route[index]);
+      const stopKeyTo = this.getNodeKeyFromName(route[index + 1]);
+      return this.calculateLeg(stopKeyFrom, stopKeyTo);
     });
     return legs.filter((leg) => leg !== undefined);
   }
 
-  calculateLeg(stopIdFrom, stopIdTo) {
-    let leg = calculateRoute(this.state.map, stopIdFrom, stopIdTo);
+  getNodeKeyFromName = (nodeName) => {
+    const nodeEntry = Object.entries(this.props.map.nodes).find(
+      (entry) => entry[1].name === nodeName
+    );
+    return !!nodeEntry ? nodeEntry[0] : undefined;
+  };
+
+  calculateLeg(stopKeyFrom, stopKeyTo) {
+    let leg = calculateRoute(this.props.map, stopKeyFrom, stopKeyTo);
     if (leg !== undefined) {
-      leg.from = this.getLabelFromId(leg.from);
-      leg.to = this.getLabelFromId(leg.to);
+      leg.from = this.getNodeNameFromKey(leg.from);
+      leg.to = this.getNodeNameFromKey(leg.to);
       leg.route.forEach((jump) => {
-        jump.from = this.getLabelFromId(jump.from);
-        jump.to = this.getLabelFromId(jump.to);
+        jump.from = this.getNodeNameFromKey(jump.from);
+        jump.to = this.getNodeNameFromKey(jump.to);
       });
     }
-    console.log(leg);
     return leg;
+  }
+
+  getNodeNameFromKey(nodeKey) {
+    const nodeName = this.props.map.nodes[nodeKey];
+    return !!nodeName ? nodeName.name : "";
   }
 }
 
