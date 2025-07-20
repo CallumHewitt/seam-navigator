@@ -14,6 +14,7 @@ const nodes = {
   tambour: { name: "Tambour", x: -731, y: -2531, z: 891, hidden: false },
   hookEye: { name: "Hook Eye", x: 2800, y: -1851, z: 853, hidden: true },
   litheAndShaw: { name: "Lithe and Shaw's Hideout", x: 3275, y: -2500, z: 1723, hidden: false },
+  wrapShawl: {name: "Wrap Shawl", x: 1375, y: -1200, z: 878, hidden: false },
 };
 
 const edges = [
